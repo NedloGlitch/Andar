@@ -8,7 +8,9 @@
         "sourceMap": true,
         "emitDecoratorMetadata": true,
         "skipLibCheck": true,
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true
     },
     "exclude": [
         "node_modules",

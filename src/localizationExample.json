@@ -1,0 +1,12 @@
+{ 
+    "start":"👋",
+    "userCreated":"User successfully created!\nBy default, you will be recieving news in messages.\nYou can disable this in \"Current Level\"",
+    "menu":"Menu",
+    "back":"Back to menu",
+    "useButtons":"Use buttons under the message",
+    "anket":"Questionary",
+    "anketDescr":"Please answer all questions",
+    "takeTest":"Complete a test",
+    "mylvl":"Current Level",
+    "lvl":"Here's your current level:\n Lv."
+}
