@@ -5,7 +5,7 @@ import { getPhrase} from './i18n'; //Locale provider
 export async function menuKeyboard(userId: number) {
   return templet(
     [   
-      [await getPhrase("anket", userId)],
+      [await getPhrase("contact", userId)],
       [await getPhrase("takeTest", userId)],
       [await getPhrase("mylvl", userId)]
     ]
@@ -20,15 +20,15 @@ export async function returnKeyboard(userId: number) {
     );
 }
 
-export async function testKeyboard(userId: number) {
+export async function adminKeyboard(userId: number){
   return templet(
-    [   
-      ["Useless Button"],
-      [await getPhrase("takeTest", userId)],
-      [await getPhrase("mylvl", userId), await getPhrase("anket", userId)],
-      [await getPhrase("menu", userId)] 
-    ]
-    );
+  [
+    [await getPhrase("sendNews", userId)],
+    [await getPhrase("makeTest", userId)],
+    [await getPhrase("deleteTest", userId)],
+    [await getPhrase("menu", userId)]
+  ]
+  );
 }
 
 function templet(buttons:string[][]){

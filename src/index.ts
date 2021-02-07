@@ -1,22 +1,19 @@
 import { Markup, Telegraf } from 'telegraf'; //Telegraf and Keyboard Markup
 import { config } from 'dotenv'; //BOT_TOKEN safe storing
 import { CallbackQuery, ExtraReplyMessage, Message, User } from 'telegraf/typings/telegram-types';
-import { createBotUser, getBotUserByUserId, addUserEXP } from './database';
+import { createBotUser, getBotUserByUserId, addUserEXP, getAllUsers } from './database';
 import { getPhrase, Phrase } from './i18n'; //Locale provider
-import { testKeyboard, menuKeyboard, returnKeyboard } from './keyboards'
+import { adminKeyboard, menuKeyboard, returnKeyboard } from './keyboards'
 import type CustomContext from './CustomContext';
-//import Markup from 'telegraf/typings/telegram'
-
-//I do comments very bad.  Be prepared.
 
 config(); //DOTENV .env file load function
 
 
 /*  ---TELEGRAF SECTION--- */
 //Telegraf State system setup
-type State = 'menu' | 'setup' | 'first' | 'second';
+type State = 'menu' | 'setup' | 'contact' | 'quiz' | 'admin' | 'sendnews' | 'reply';
 const user_states = new Map<number, State>(); // TEMPLATE FOR STATE SET\GET: key: chatId, value: State
-//const anket = new Map<number, string[]>();
+let reply_person:string
 
 
 //Telegraf bot creation
@@ -43,7 +40,7 @@ bot.use((ctx, next) => {
 //Bot action on /start command
 bot.start(async (ctx) => {
   if (!ctx.from) return; //exclude undefined in ctx.from 
-  ctx.reply("👋", Markup.inlineKeyboard([CLB("🇷🇺"), CLB("🇺🇸")]))
+  ctx.reply("👋", Markup.inlineKeyboard([CLB("🇷🇺"), CLB("🇺🇦")]))
   user_states.set(ctx.from.id, 'setup')
 })
 
@@ -54,29 +51,42 @@ bot.on('text', async (ctx) => {
   if (!ctx.from) return; //exclude undefined in ctx.from 
   if (await getBotUserByUserId(ctx.from.id) == undefined) {      //NO USER IN DATABASE CHECK
     await ctx.reply("❌ Looks like you aren't registered in database, we will start over", Markup.removeKeyboard())
-    await ctx.reply("👋", Markup.inlineKeyboard([CLB("🇷🇺"), CLB("🇺🇸")]))
+    await ctx.reply("👋", Markup.inlineKeyboard([CLB("🇷🇺"), CLB("🇺🇦")]))
     user_states.set(ctx.from.id, 'setup')
   }
   else {
-    //let anket:string[] = [ctx.message.text];
+    //let contact:string[] = [ctx.message.text];
     const user_state = user_states.get(ctx.from.id);
     switch (user_state) {
       case 'setup': //setup has no text commands
         break;
-      case 'first':
-        await anket_handler(ctx);
+      case 'contact':
+        await contact_handler(ctx);
         break;
-      case 'second':
-        await test_choice_handler(ctx);
+      case 'quiz':
+        await quiz_handler(ctx);
         break;
       case 'menu':
         await menu_handler(ctx);
         break;
+      case 'admin':
+        await admin_handler(ctx);
+        break;
+      case 'sendnews':
+        await news_handler(ctx);
+        break;
+      case 'reply':
+        await reply_handler(ctx);
+        break;
       //DEFAULT
       default:
-        await ctx.replyWithPhrase("afterRestart", Markup.removeKeyboard())
+        await ctx.replyWithPhrase("afterRestart")
         await ctx.replyWithPhrase('back', await menuKeyboard(ctx.from.id));
         user_states.set(ctx.from.id, 'menu');
+        if (ctx.from.id.toString() == process.env.ADMIN_ID as string){
+          ctx.replyWithPhrase("admin", await adminKeyboard(ctx.from.id))
+          user_states.set(ctx.from.id, 'admin');
+        }
         break;
     }
   }
@@ -87,46 +97,135 @@ bot.on('text', async (ctx) => {
 //Use special scenario for handling callback (scene specific)
 bot.on('callback_query', async (ctx) => {
   if (!ctx.from) return; //exclude undefined in ctx.from 
+  else
   switch (user_states.get(ctx.from.id)) {
     case "setup":
       await setup_callback_handler(ctx)
       break;
-    case "second":
-      await test_choice_callback_handler(ctx)
+    case "quiz":
+      await quiz_callback_handler(ctx)
       break;
     //DEFAULT
     default:
-      ctx.replyWithPhrase("badButton", Markup.removeKeyboard())
-      ctx.replyWithPhrase('back', await menuKeyboard(ctx.from.id));
-      user_states.set(ctx.from.id, 'menu');
+      if(ctx.from.id.toString() == process.env.ADMIN_ID as string) {
+        ctx.replyWithPhrase("replyMessage", await returnKeyboard(ctx.from.id))
+        user_states.set(ctx.from.id, 'reply');
+        reply_person = (ctx.callbackQuery as CallbackQuery.DataCallbackQuery).data
+        ctx.editMessageText((ctx.callbackQuery.message as Message.TextMessage).text + "\n"+ await getPhrase("replyDone", ctx.from.id));
+      }
+      else {
+        ctx.replyWithPhrase("badButton", Markup.removeKeyboard())
+        ctx.replyWithPhrase('back', await menuKeyboard(ctx.from.id));
+        user_states.set(ctx.from.id, 'menu');
+      }
       break;
+  }
+})
+
+//NEWS PHOTO HANDLER
+bot.on('photo', async (ctx) => {
+  if (!ctx.from) return; //exclude undefined in ctx.from 
+  if(user_states.get(ctx.from.id) == "sendnews"){
+    if (ctx.message.caption == await getPhrase("menu", ctx.from.id)) {
+      ctx.replyWithPhrase("back", await menuKeyboard(ctx.from.id))
+      user_states.set(ctx.from.id, 'menu');
+    }
+    else {
+      await ctx.reply("✅", await menuKeyboard(ctx.from.id))
+      user_states.set(ctx.from.id, 'menu');
+      let users = await getAllUsers();
+      if (users.length != 0){
+        for(let i = 0; i < users.length; i++){
+          if (!ctx.message.caption)
+            await bot.telegram.sendPhoto(users[i].userId, ctx.message.photo[0].file_id)
+          else
+            await bot.telegram.sendPhoto(users[i].userId, ctx.message.photo[0].file_id, {caption: ctx.message.caption})
+        }
+      }
+      else
+        ctx.reply("В БАЗЕ ДАННЫХ НЕТ ПОЛЬЗОВАТЕЛЕЙ")
+    }
   }
 })
 
 
 
-
-
-
 /* --BOT SCENE HANDLERS SECTION-- */
+
+// -admin handler-
+async function admin_handler(ctx: CustomContext & { message: Message.TextMessage }) {
+  if (!ctx.from) return; //exclude undefined in ctx.from 
+  if (ctx.message.text == await getPhrase("sendNews", ctx.from.id)) {
+    await ctx.replyWithPhrase("newsDescr", await returnKeyboard(ctx.from.id))
+    user_states.set(ctx.from.id, 'sendnews');
+  }
+  else if(ctx.message.text == await getPhrase("makeTest", ctx.from.id))
+    ctx.reply("Не готово")
+  else if(ctx.message.text == await getPhrase("deleteTest", ctx.from.id))
+    ctx.reply("Не готово")
+  else if(ctx.message.text == await getPhrase("menu", ctx.from.id)){
+    await ctx.replyWithPhrase("back", await menuKeyboard(ctx.from.id))
+    user_states.set(ctx.from.id, 'menu');
+  }
+  else    
+    ctx.replyWithPhrase("useButtons")
+}
+
+async function news_handler(ctx: CustomContext & { message: Message.TextMessage }) {
+  if (!ctx.from) return; //exclude undefined in ctx.from 
+  if (ctx.message.text == await getPhrase("menu", ctx.from.id)) {
+    ctx.replyWithPhrase("back", await menuKeyboard(ctx.from.id))
+    user_states.set(ctx.from.id, 'menu');
+  }
+  else { //Text handler
+    await ctx.reply("✅", await menuKeyboard(ctx.from.id))
+    user_states.set(ctx.from.id, 'menu');
+    let users = await getAllUsers();
+    if (users.length != 0){
+      for(let i = 0; i < users.length; i++){
+          await bot.telegram.sendMessage(users[i].userId, ctx.message.text)
+      }
+    }
+  }
+}
+
+async function reply_handler(ctx: CustomContext & { message: Message.TextMessage }) {
+  if (!ctx.from) return; //exclude undefined in ctx.from 
+  if(ctx.message.text == await getPhrase("menu", ctx.from.id)){
+    await ctx.replyWithPhrase("back", await menuKeyboard(ctx.from.id))
+    user_states.set(ctx.from.id, 'menu');
+    reply_person = "";
+  }
+  else {
+    if(reply_person == "")
+      ctx.reply("ПОТЕРЯНО: КОМУ ОТПРАВЛЯТЬ ОТВЕТ", await menuKeyboard(ctx.from.id))
+    else {
+      await ctx.reply("✅", await menuKeyboard(ctx.from.id))
+      await bot.telegram.sendMessage(reply_person, "✉️✉️✉️\n"+ctx.message.text+"\n✉️✉️✉️");
+      reply_person = "";
+    }
+    user_states.set(ctx.from.id, 'menu');
+  }
+}
+
 
 // -menu handler-
 async function menu_handler(ctx: CustomContext & { message: Message.TextMessage }) {
   if (!ctx.from) return; //exclude undefined in ctx.from 
 
-  //ANKET SCENARIO
-  if (ctx.message.text == await getPhrase("anket", ctx.from.id)) {
-    await ctx.replyWithPhrase("anketQuestion4", await returnKeyboard(ctx.from.id))
-    user_states.set(ctx.from.id, 'first');
+  //contact SCENARIO
+  if (ctx.message.text == await getPhrase("contact", ctx.from.id)) {
+    await ctx.replyWithPhrase("contactDescr", await returnKeyboard(ctx.from.id))
+    user_states.set(ctx.from.id, 'contact');
   }
 
 
-  //TEST SCENARIO
+  //quiz SCENARIO
   else if (ctx.message.text == await getPhrase("takeTest", ctx.from.id)) {
     await ctx.reply("↴", await returnKeyboard(ctx.from.id))
     ctx.reply("What creature can fly?", //line continues below
       Markup.inlineKeyboard([CLB("Cat"), CLB("Fish"), CLB("Bird"), CLB("Snake")]));
-    user_states.set(ctx.from.id, 'second'); //Go to second_handler
+    user_states.set(ctx.from.id, 'quiz'); //Go to second_handler
   }
 
   //MY LVL SCENARIO
@@ -136,9 +235,14 @@ async function menu_handler(ctx: CustomContext & { message: Message.TextMessage 
       ctx.reply("No user found")
     }
     else {
-      ctx.replyWithExperience(searchResult.exp)
+      await ctx.replyWithExperience(searchResult.exp)
+      if (ctx.from.id.toString() == (process.env.ADMIN_ID as string)){
+        await ctx.replyWithPhrase("admin", await adminKeyboard(ctx.from.id))
+        user_states.set(ctx.from.id, 'admin');
+      }
     }
   }
+  
   else {
     ctx.reply(await getPhrase("useButtons", ctx.from.id), await menuKeyboard(ctx.from.id));
   }
@@ -147,11 +251,10 @@ async function menu_handler(ctx: CustomContext & { message: Message.TextMessage 
 // -setup callback handler-
 async function setup_callback_handler(ctx: CustomContext) {
   if (!ctx.from) return; //exclude undefined in ctx.from 
-  if ((ctx.callbackQuery as CallbackQuery.DataCallbackQuery).data == "🇷🇺" || "🇺🇸") {
+  if ((ctx.callbackQuery as CallbackQuery.DataCallbackQuery).data == "🇷🇺" || "🇺🇸" || "🇺🇦") {
     await createBotUser({
       userId: ctx.from.id,
-      news: true,
-      language: (ctx.callbackQuery as CallbackQuery.DataCallbackQuery).data as "ru" || "en",
+      language: (ctx.callbackQuery as CallbackQuery.DataCallbackQuery).data as "ru" || "en" || "ua",
       exp: 10
     });
     ctx.deleteMessage()
@@ -163,53 +266,24 @@ async function setup_callback_handler(ctx: CustomContext) {
 }
 
 
-async function anket_handler(ctx: CustomContext & { message: Message.TextMessage }) {
+async function contact_handler(ctx: CustomContext & { message: Message.TextMessage }) {
   if (!ctx.from) return; //exclude undefined in ctx.from 
   if (ctx.message.text == await getPhrase("menu", ctx.from.id)) {
     ctx.replyWithPhrase("back", await menuKeyboard(ctx.from.id))
     user_states.set(ctx.from.id, 'menu');
   }
-  else {
+  else { //Text handler
     await ctx.replyWithPhrase("thankyou", await menuKeyboard(ctx.from.id))
     user_states.set(ctx.from.id, 'menu');
-    await bot.telegram.sendMessage("512554939", ctx.message.text)
+    await bot.telegram.sendMessage(process.env.ADMIN_ID as string, "✉️✉️✉️\n➡️\""+ctx.from.username+"\" "
+    +ctx.from.first_name+" "+ctx.from.last_name+":↴\n"+ctx.message.text+"\n✉️✉️✉️",
+    Markup.inlineKeyboard([Markup.button.callback(await getPhrase('doReply', ctx.from.id), ctx.from.id.toString())]) )
   }
 }
-// -test1 question scene- 
-/*async function anket_handler(ctx: CustomContext & { message: Message.TextMessage }) {
-  if (!ctx.from) return; //exclude undefined in ctx.from 
-  if (ctx.message.text == await getPhrase("menu", ctx.from.id)) {
-    ctx.replyWithPhrase("back", await menuKeyboard(ctx.from.id))
-    user_states.set(ctx.from.id, 'menu');
-  }
-  else if (ctx.message.text == "Andar") {
-    ctx.reply("Ye, you right!\n(Go back in menu or try again)", await testKeyboard(ctx.from.id))
-    await addUserEXP(ctx.from.id, 1);
-  }
-  else if(anket.length == 0){
-   ctx.replyWithPhrase("anketQuestion1")
-  } 
-  else if(anket.get(ctx.from.id) == undefined || anket.get(ctx.from.id)?.length == 0){
-    anket.set(ctx.from.id, [ctx.message.text])
-    ctx.replyWithPhrase("anketQuestion2")
-  }
-  else if(anket.get(ctx.from.id)?.length == 1) {
-    anket.set(ctx.from.id)
-    ctx.replyWithPhrase("anketQuestion3")
-  }
-  else if(anket.get(ctx.from.id)?.length == 2) {
-    anket.set(ctx.from.id, [ctx.message.text])
-    ctx.replyWithPhrase("anketQuestion3")
-    await ctx.replyWithPhrase("thankyou", await menuKeyboard(ctx.from.id))
-    user_states.set(ctx.from.id, 'menu');
-    await bot.telegram.sendMessage("512554939", anket.join("\n"))
-  }
-  else
-    ctx.reply("something went wrong")
-}*/
+
 
 // -test2 question scene-
-async function test_choice_handler(ctx: CustomContext & { message: Message.TextMessage }) {
+async function quiz_handler(ctx: CustomContext & { message: Message.TextMessage }) {
   if (!ctx.from) return; //exclude undefined in ctx.from 
   if (ctx.message.text == await getPhrase("menu", ctx.from.id)) {
     ctx.replyWithPhrase("back", await menuKeyboard(ctx.from.id))
@@ -219,7 +293,7 @@ async function test_choice_handler(ctx: CustomContext & { message: Message.TextM
     ctx.replyWithPhrase("useButtons", await menuKeyboard(ctx.from.id))
 }
 
-async function test_choice_callback_handler(ctx: CustomContext) {
+async function quiz_callback_handler(ctx: CustomContext) {
   if (!ctx.from) return; //exclude undefined in ctx.from 
   const answer = "Bird"
   if ((ctx.callbackQuery as CallbackQuery.DataCallbackQuery).data == answer) { //waiting for answer(callback)
@@ -234,20 +308,6 @@ async function test_choice_callback_handler(ctx: CustomContext) {
     user_states.set(ctx.from.id, 'menu'); //Go to menu
   }
 }
-
-
-/* ---Quality of life functions--- */
-/*
-function choice(ctx: Context){
-  console.log("message from test point")
-  let streng:string
-  getPhrase("menu", ctx.from.id).then( (value)=>{
-    streng = value;   
-    ctx.reply(streng)
-    console.log("message within, observe - " + value)
-  })
-  console.log("message from end of test point")
-}*/
 
 function CLB(name: string) { //CallBack button fast creation
   return Markup.button.callback(name, name)

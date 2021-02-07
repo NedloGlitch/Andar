@@ -6,10 +6,10 @@ import { getUserLocaleFromCache, setUserLocaleToCache } from './cache';
 import localizationExample from './localizationExample.json';
 
 export type Phrase = keyof typeof localizationExample;
-export type Locale = 'en' | 'ru';
+export type Locale = 'en' | 'ru' | 'ua';
 
 configure({
-    locales: ['en', 'ru'],
+    locales: ['en', 'ru', 'ua'],
     directory: join(__dirname, ".." , 'locale')
 })
 

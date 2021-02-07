@@ -11,9 +11,6 @@ export class Users {
     userId!: number;
 
     @Column()
-    news!: boolean;
-
-    @Column()
     language!: Locale;
 
     @Column()

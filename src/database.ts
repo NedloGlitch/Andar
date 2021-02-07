@@ -1,6 +1,7 @@
 import { createConnection, Repository } from "typeorm";
 import { Users } from './entity/Users';
 import { Questions } from './entity/Questions';
+import { setUserLocaleToCache } from './cache'
 
 let usersrepos : Repository<Users>;
 let questionsrepos : Repository<Questions>;
@@ -18,11 +19,11 @@ const initialize = async () => {
 }
 
 export const createBotUser = (user: Users): Promise<Users> => {
-        const newUser = new Users();
-        newUser.userId = user.userId;
-        newUser.news = user.news;
-        newUser.language = langTransform(user.language);
-        newUser.exp = user.exp;
+    const newUser = new Users();
+    newUser.userId = user.userId;
+    newUser.language = langTransform(user.language);
+    newUser.exp = user.exp;
+    setUserLocaleToCache(newUser.userId, newUser.language);
     return usersrepos.save(newUser);
 }
 
@@ -39,10 +40,15 @@ export async function addUserEXP(userId: number, amount: number) {
     }
 }
 
+export async function getAllUsers() {
+    return await usersrepos.find();
+}
+
 initialize();
 
 function langTransform(language:string) {
     if(language == "🇷🇺") return "ru"
     else if(language == "🇺🇸") return "en"
+    else if(language == "🇺🇦") return "ua"
     else return "en"
 }
