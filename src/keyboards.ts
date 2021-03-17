@@ -31,6 +31,17 @@ export async function adminKeyboard(userId: number){
   );
 }
 
+export async function answerKeyboard(userId: number, answer:string) {
+  let temp = answer.split(";")
+  let temp2:string[][] = [];
+  for(let i=0;i<temp.length;i++){
+    temp2.push([temp[i]])
+  }
+  temp2.push([await getPhrase("menu", userId)])
+  return templet(temp2);
+}
+
+
 function templet(buttons:string[][]){
   let tempboard: ExtraReplyMessage = {
     reply_markup: {

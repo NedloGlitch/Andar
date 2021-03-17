@@ -19,5 +19,11 @@
     "admin":"Admin Menu",
     "replyMessage":"Send your reply",
     "doReply":"Reply",
-    "replyDone":"REPLY ALREADY DONE"
+    "replyDone":"REPLY ALREADY DONE",
+    "chooseQuiz":"Select a quiz you want to complete ↴",
+    "chosenQuiz":"Test: ",
+    "startQuiz":"▶️ Do test",
+    "endQuiz":"Test end! Let's see the results:",
+    "quizNumber":"Question №",
+    "lvlRequired":"\n⛔ LVL Required: "
 }

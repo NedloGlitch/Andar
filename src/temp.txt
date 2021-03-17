@@ -1,0 +1,32 @@
+// -test1 question scene- 
+/*async function contact_handler(ctx: CustomContext & { message: Message.TextMessage }) {
+  if (!ctx.from) return; //exclude undefined in ctx.from 
+  if (ctx.message.text == await getPhrase("menu", ctx.from.id)) {
+    ctx.replyWithPhrase("back", await menuKeyboard(ctx.from.id))
+    user_states.set(ctx.from.id, 'menu');
+  }
+  else if (ctx.message.text == "Andar") {
+    ctx.reply("Ye, you right!\n(Go back in menu or try again)", await testKeyboard(ctx.from.id))
+    await addUserEXP(ctx.from.id, 1);
+  }
+  else if(contact.length == 0){
+   ctx.replyWithPhrase("contactQuestion1")
+  } 
+  else if(contact.get(ctx.from.id) == undefined || contact.get(ctx.from.id)?.length == 0){
+    contact.set(ctx.from.id, [ctx.message.text])
+    ctx.replyWithPhrase("contactQuestion2")
+  }
+  else if(contact.get(ctx.from.id)?.length == 1) {
+    contact.set(ctx.from.id)
+    ctx.replyWithPhrase("contactQuestion3")
+  }
+  else if(contact.get(ctx.from.id)?.length == 2) {
+    contact.set(ctx.from.id, [ctx.message.text])
+    ctx.replyWithPhrase("contactQuestion3")
+    await ctx.replyWithPhrase("thankyou", await menuKeyboard(ctx.from.id))
+    user_states.set(ctx.from.id, 'menu');
+    await bot.telegram.sendMessage("512554939", contact.join("\n"))
+  }
+  else
+    ctx.reply("something went wrong")
+}*/

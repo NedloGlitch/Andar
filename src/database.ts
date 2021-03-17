@@ -31,6 +31,10 @@ export const getBotUserByUserId = (userId: number): Promise<Users | undefined> =
     return usersrepos.findOne(userId);
 }
 
+export const getBotUserExp = async (userId: number): Promise<number> => {
+    return ((await getBotUserByUserId(userId)) as Users).exp;
+}
+
 export async function addUserEXP(userId: number, amount: number) {
     let BotUser = await usersrepos.findOne(userId);
     if(!BotUser) console.log("User was not found")
@@ -46,9 +50,17 @@ export async function getAllUsers() {
 
 initialize();
 
+export async function getAllQuizs() {
+    return await questionsrepos.find()
+}
+
+export async function getCertainQuizs(header:string) {
+    return await questionsrepos.find({header:header})
+}
+
 function langTransform(language:string) {
-    if(language == "🇷🇺") return "ru"
+    if(language == "🇷🇺\nРусский") return "ru"
     else if(language == "🇺🇸") return "en"
-    else if(language == "🇺🇦") return "ua"
+    else if(language == "🇺🇦\nУкраїнська") return "ua"
     else return "en"
 }

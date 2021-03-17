@@ -20,7 +20,7 @@ export async function getPhrase(phrase: Phrase, userId: number) {
     return __({ phrase, locale });
 }
 
-async function getUserLocale(userId: number): Promise<string> {
+export async function getUserLocale(userId: number): Promise<string> {
     let locale = getUserLocaleFromCache(userId);
     if (!locale) {
         const user = await getBotUserByUserId(userId);

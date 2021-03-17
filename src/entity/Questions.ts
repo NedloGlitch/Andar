@@ -1,3 +1,4 @@
+//import { text } from "telegraf/typings/button";
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity()
@@ -12,9 +13,12 @@ export class Questions {
     @Column()
     description!: string;
 
-    @Column()
-    answers!: string;
+    @Column({
+        type: 'text',
+        nullable: true})
+    answer!: string | null;
 
     @Column()
     correctAnswer!: string;
+    
 }

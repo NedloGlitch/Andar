@@ -6,4 +6,6 @@ import type { Phrase } from "./i18n";
 export default interface CustomContext extends Context {
     replyWithPhrase(phrase: Phrase, extra?: ExtraReplyMessage): ReturnType<Context["reply"]>;
     replyWithExperience(currentExperience:number): ReturnType<Context["reply"]>;
+    replyWithQuizListItem(header:string, description:string): ReturnType<Context["reply"]>;
+    replyWithQuestion(position:number): ReturnType<Context["reply"]>;
 }
