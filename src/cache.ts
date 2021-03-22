@@ -1,7 +1,7 @@
 //import { createClient, print } from 'redis';
 
 //import { fchmod } from "fs/promises";
-import { getCertainQuizs } from "./database";
+import { getCertainQuiz } from "./database";
 import { Locale } from "./i18n";
 //const client = createClient();
 
@@ -45,8 +45,8 @@ export const emptyStoredString = (userId:number) => stringStorage.set(userId, []
 
 const questionStorage = new Map<number, string[]>()
 
-export const setQuestionStorage = async(userId: number, header: string) => {
-    let dataArray = await getCertainQuizs(header)
+export const setStoredQuestion = async(userId: number, header: string) => {
+    let dataArray = await getCertainQuiz(header)
     let questionArray:string[] = []
     for(let i = 1; i<dataArray.length; i++) //Add questions
         questionArray.push(dataArray[i].description)
@@ -58,17 +58,17 @@ export const setQuestionStorage = async(userId: number, header: string) => {
     for(let i = 1; i<dataArray.length; i++) //Add correctAnswers
         questionArray.push(dataArray[i].correctAnswer)
     questionStorage.set(userId, questionArray)
-
 }
 
-export const getAllQuestionStored = (userId: number): string[] => {
-    if(!questionStorage.get(userId))
-        return ["NO QUESTIONS STORED ERROR"]
+export const getAllQuestionStored = (userId: number): string[]=> {
+    let questions = questionStorage.get(userId)
+    if(!questions)
+        return ["GetAllQuestions error"]
     else
-        return questionStorage.get(userId) as string[]
+        return questions
 }
 
-export const emptyQuestionStored = (userId:number) => questionStorage.set(userId, [])
+export const emptyStoredQuestion = (userId:number) => questionStorage.set(userId, [])
 
 
 

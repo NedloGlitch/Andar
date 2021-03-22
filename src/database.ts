@@ -50,12 +50,34 @@ export async function getAllUsers() {
 
 initialize();
 
+export const createQuestion = (question: Questions): Promise<Questions> => {
+    const newQuestion = new Questions();
+    if(question.id!=0) newQuestion.id = question.id;
+    newQuestion.header = question.header;
+    newQuestion.description = question.description;
+    newQuestion.answer = question.answer;
+    newQuestion.correctAnswer = question.correctAnswer;
+    return questionsrepos.save(newQuestion);
+}
+
 export async function getAllQuizs() {
     return await questionsrepos.find()
 }
 
-export async function getCertainQuizs(header:string) {
+export async function getCertainQuiz(header:string) {
     return await questionsrepos.find({header:header})
+}
+
+export async function getCertainHeader(header:string) {
+    return await questionsrepos.findOne({header:header})
+}
+
+export async function deleteQuiz(header:string) {
+    return await questionsrepos.delete({header:header})
+}
+
+export async function deleteQuestion(id:number) {
+    return await questionsrepos.delete({id:id})
 }
 
 function langTransform(language:string) {
