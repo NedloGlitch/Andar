@@ -1,7 +1,7 @@
 import { Users } from './entity/Users';
 import { Questions } from './entity/Questions';
-import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import { SqliteConnectionOptions } from 'typeorm/driver/sqlite/SqliteConnectionOptions';
+import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 
 export const sqliteConfig: SqliteConnectionOptions = {
   type: "sqlite",
@@ -11,21 +11,14 @@ export const sqliteConfig: SqliteConnectionOptions = {
   logging: false
 }
 //export const postgresConfig = sqliteConfig
-export const postgresConfig: PostgresConnectionOptions = {
-  type: "postgres",
-    /*host: "ec2-54-155-226-153.eu-west-1.compute.amazonaws.com",
-    port: 5432,
-    username: "ugljkacrcymoqn",
-    password: process.env.POSTGRES_PASSWORD,
-    database: "d2cpa1v5m6ul8d",*/
-  url: process.env.DATABASE_URL,
+export const mysqlConfig:MysqlConnectionOptions = {
+  type: "mysql",
+  host: "f80b6byii2vwv8cx.chr7pe7iynqr.eu-west-1.rds.amazonaws.com",
+  port: 3306,
+  username: "ra89bfmdrx3hizpl",
+  password: process.env.MYSQL_PASSWORD,
+  database: "xhk2fnk2le3o66wm",
   synchronize: true,
   logging: false,
   entities: [Users, Questions],
-  ssl: true,
-  extra: {
-    ssl: {
-      rejectUnauthorized: false
-    }
-  }
 }

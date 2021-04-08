@@ -1,7 +1,7 @@
 import { Markup, Telegraf } from 'telegraf'; //Telegraf and Keyboard Markup
 import { config } from 'dotenv'; //BOT_TOKEN safe storing
 import { CallbackQuery, ExtraReplyMessage, Message, User } from 'telegraf/typings/telegram-types';
-import { createBotUser, getBotUserByUserId, addUserEXP, getAllUsers, getAllQuizs, getBotUserExp, createQuestion, deleteQuiz, getCertainQuiz, deleteQuestion, getCertainHeader, updateQuestion } from './database';
+import { createBotUser, getBotUserByUserId, addUserEXP, getAllUsers, getAllQuizs, getBotUserExp, createQuestion, deleteQuiz, getCertainQuiz, deleteQuestion, getCertainHeader } from './database';
 import { getPhrase, getUserLocale, Phrase } from './i18n'; //Locale provider
 import { addKeyboard, adminKeyboard, answerKeyboard, denyKeyboard, languageKeyboard, menuKeyboard, returnKeyboard } from './keyboards'
 import type CustomContext from './CustomContext';
@@ -537,7 +537,6 @@ async function edit_question_handler(ctx: CustomContext & { message: Message.Tex
 async function edit_description_handler(ctx: CustomContext & { message: Message.TextMessage }) {
   if (!ctx.from) return; //exclude undefined in ctx.from 
   let stored = getStoredString(ctx.from.id)
-  console.log(stored)
   if (!stored) ctx.reply("edit description bad stuff");
   else {
     if (ctx.message.text == await getPhrase("menu", ctx.from.id)) {
@@ -569,11 +568,10 @@ async function edit_description_handler(ctx: CustomContext & { message: Message.
           temp = "ua"
         //let question:Omit<Questions, "id">
         let stored = getStoredString(ctx.from.id)
-        console.log(stored)
         if (!stored || stored.length < 4)
           ctx.reply("String lost, not enough data")
         else {
-          updateQuestion({
+          await createQuestion({
             id: parseInt(stored[0]),
             header: stored[1],
             description: stored[2],
@@ -617,7 +615,7 @@ async function editing_handler(ctx: CustomContext & { message: Message.TextMessa
           if (temp == "-No Answers-") return null
           else return temp;
         }
-        updateQuestion({
+        await createQuestion({
           id: parseInt(stored[0]),
           header: stored[1],
           description: stored[2],
@@ -719,7 +717,6 @@ async function edit_quiz_callback_handler(ctx: CustomContext) {
   await ctx.reply("➡ " + (ctx.callbackQuery as CallbackQuery.DataCallbackQuery).data, await addKeyboard(ctx.from.id))
   emptyStoredString(ctx.from.id)
   let temp = await getCertainQuiz((ctx.callbackQuery as CallbackQuery.DataCallbackQuery).data)
-  console.log(temp)
   setStoredString(ctx.from.id, temp[0].header)
   await ctx.reply("📝 " + await getPhrase("description", ctx.from.id) + ": " + temp[0].description)
   for (let i = 1; i < temp.length; i++) {

@@ -2,12 +2,12 @@ import { createConnection, Repository } from "typeorm";
 import { Users } from './entity/Users';
 import { Questions } from './entity/Questions';
 import { setUserLocaleToCache } from './cache'
-import { postgresConfig, sqliteConfig } from "./config";
+import { mysqlConfig, sqliteConfig } from "./config";
 
 let usersrepos : Repository<Users>;
 let questionsrepos : Repository<Questions>;
 
-const connectionConfig = process.env.DEV === 'TRUE' ? sqliteConfig : postgresConfig;
+const connectionConfig = process.env.DEV === 'TRUE' ? sqliteConfig : mysqlConfig;
 
 const initialize = async () => {
     const connection = await createConnection(
@@ -57,16 +57,6 @@ export const createQuestion = (question: Questions): Promise<Questions> => {
     newQuestion.answer = question.answer;
     newQuestion.correctAnswer = question.correctAnswer;
     return questionsrepos.save(newQuestion);
-}
-
-export const updateQuestion = (question: Questions) => {
-    const newQuestion = new Questions();
-    if(question.id!=0) newQuestion.id = question.id;
-    newQuestion.header = question.header;
-    newQuestion.description = question.description;
-    newQuestion.answer = question.answer;
-    newQuestion.correctAnswer = question.correctAnswer;
-    questionsrepos.update( {id:question.id} , newQuestion);
 }
 
 export async function getAllQuizs() {
