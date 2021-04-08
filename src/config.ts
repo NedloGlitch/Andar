@@ -13,15 +13,15 @@ export const sqliteConfig: SqliteConnectionOptions = {
 //export const postgresConfig = sqliteConfig
 export const mysqlConfig:MysqlConnectionOptions = {
   type: "mysql",
-  host: "f80b6byii2vwv8cx.chr7pe7iynqr.eu-west-1.rds.amazonaws.com",
+  host: "yvu4xahse0smimsc.chr7pe7iynqr.eu-west-1.rds.amazonaws.com",
   port: 3306,
-  username: "ra89bfmdrx3hizpl",
+  username: "qyspm73g5u591nge",
   password: process.env.MYSQL_PASSWORD,
-  database: "xhk2fnk2le3o66wm",
+  database: "chswsj9borunblfl",
   synchronize: true,
   logging: false,
   entities: [Users, Questions],
   extra: {
-    charset: "utf8mb4_unicode_ci"
+    charset: "utf8mb4"
   }
 }
