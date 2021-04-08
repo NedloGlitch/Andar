@@ -1,7 +1,7 @@
 import { Markup, Telegraf } from 'telegraf'; //Telegraf and Keyboard Markup
 import { config } from 'dotenv'; //BOT_TOKEN safe storing
 import { CallbackQuery, ExtraReplyMessage, Message, User } from 'telegraf/typings/telegram-types';
-import { createBotUser, getBotUserByUserId, addUserEXP, getAllUsers, getAllQuizs, getBotUserExp, createQuestion, deleteQuiz, getCertainQuiz, deleteQuestion, getCertainHeader } from './database';
+import { createBotUser, getBotUserByUserId, addUserEXP, getAllUsers, getAllQuizs, getBotUserExp, createQuestion, deleteQuiz, getCertainQuiz, deleteQuestion, getCertainHeader, updateQuestion } from './database';
 import { getPhrase, getUserLocale, Phrase } from './i18n'; //Locale provider
 import { addKeyboard, adminKeyboard, answerKeyboard, denyKeyboard, languageKeyboard, menuKeyboard, returnKeyboard } from './keyboards'
 import type CustomContext from './CustomContext';
@@ -573,7 +573,7 @@ async function edit_description_handler(ctx: CustomContext & { message: Message.
         if (!stored || stored.length < 4)
           ctx.reply("String lost, not enough data")
         else {
-          await createQuestion({
+          updateQuestion({
             id: parseInt(stored[0]),
             header: stored[1],
             description: stored[2],
@@ -617,7 +617,7 @@ async function editing_handler(ctx: CustomContext & { message: Message.TextMessa
           if (temp == "-No Answers-") return null
           else return temp;
         }
-        await createQuestion({
+        updateQuestion({
           id: parseInt(stored[0]),
           header: stored[1],
           description: stored[2],

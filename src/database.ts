@@ -59,6 +59,16 @@ export const createQuestion = (question: Questions): Promise<Questions> => {
     return questionsrepos.save(newQuestion);
 }
 
+export const updateQuestion = (question: Questions) => {
+    const newQuestion = new Questions();
+    if(question.id!=0) newQuestion.id = question.id;
+    newQuestion.header = question.header;
+    newQuestion.description = question.description;
+    newQuestion.answer = question.answer;
+    newQuestion.correctAnswer = question.correctAnswer;
+    questionsrepos.update( {id:question.id} , newQuestion);
+}
+
 export async function getAllQuizs() {
     return await questionsrepos.find()
 }
