@@ -17,6 +17,7 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "i18n": "^0.13.2",
+    "pg": "^8.5.1",
     "sqlite3": "^5.0.1",
     "telegraf": "^4.0.1",
     "typeorm": "^0.2.30"
