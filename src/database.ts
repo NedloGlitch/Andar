@@ -2,18 +2,17 @@ import { createConnection, Repository } from "typeorm";
 import { Users } from './entity/Users';
 import { Questions } from './entity/Questions';
 import { setUserLocaleToCache } from './cache'
+import { postgresConfig, sqliteConfig } from "./config";
 
 let usersrepos : Repository<Users>;
 let questionsrepos : Repository<Questions>;
 
+const connectionConfig = process.env.DEV === 'TRUE' ? sqliteConfig : postgresConfig;
+
 const initialize = async () => {
-    const connection = await createConnection({
-        type: "sqlite",
-        database: "database.db",
-        entities: [Users, Questions],
-        synchronize: true,
-        logging: false,
-    })
+    const connection = await createConnection(
+        connectionConfig
+    )
     usersrepos = connection.getRepository(Users);
     questionsrepos = connection.getRepository(Questions);
 }
