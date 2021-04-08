@@ -216,7 +216,6 @@ async function admin_handler(ctx: CustomContext & { message: Message.TextMessage
     //emptyStoredString(ctx.from.id)
     //emptyStoredQuestion(ctx.from.id)
     quiz_select_function(ctx);
-    ctx.reply("Не готово")
     user_states.set(ctx.from.id, 'editquiz')
   }
   else if (ctx.message.text == await getPhrase("deleteTest", ctx.from.id)) {
