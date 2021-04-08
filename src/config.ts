@@ -21,4 +21,7 @@ export const mysqlConfig:MysqlConnectionOptions = {
   synchronize: true,
   logging: false,
   entities: [Users, Questions],
+  extra: {
+    charset: "utf8mb4_unicode_ci"
+  }
 }
