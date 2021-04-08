@@ -58,6 +58,7 @@ export const setStoredQuestion = async(userId: number, header: string) => {
     for(let i = 1; i<dataArray.length; i++) //Add correctAnswers
         questionArray.push(dataArray[i].correctAnswer)
     questionStorage.set(userId, questionArray)
+    return dataArray[0].description
 }
 
 export const getAllQuestionStored = (userId: number): string[]=> {
