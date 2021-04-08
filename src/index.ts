@@ -726,6 +726,7 @@ async function edit_quiz_callback_handler(ctx: CustomContext) {
       Markup.inlineKeyboard([Markup.button.callback("❌", "❌" + temp[i].id), Markup.button.callback("☷", temp[i].id + "☷" + temp[i].header)]))
       .then((message) => { setStoredString(tempUserId, message.message_id.toString()) });
   }
+  console.log(stored)
   user_states.set(ctx.from.id, "editquestion")
 }
 
