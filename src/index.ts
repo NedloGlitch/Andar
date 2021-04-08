@@ -685,7 +685,7 @@ async function select_quiz_callback_handler(ctx: CustomContext) {
       await ctx.deleteMessage(+stored[i]) //+ is converting string to number
     }
   await ctx.reply(await getPhrase("chosenQuiz", ctx.from.id) + ": " + (ctx.callbackQuery as CallbackQuery.DataCallbackQuery).data, await returnKeyboard(ctx.from.id))
-  ctx.reply("📝 "+await setStoredQuestion(ctx.from.id, (ctx.callbackQuery as CallbackQuery.DataCallbackQuery).data))
+  await ctx.reply("📝 "+ await setStoredQuestion(ctx.from.id, (ctx.callbackQuery as CallbackQuery.DataCallbackQuery).data))
   user_states.set(ctx.from.id, 'quiz')
   emptyStoredString(ctx.from.id)
   let questions = getAllQuestionStored(ctx.from.id)
