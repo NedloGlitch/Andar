@@ -457,11 +457,11 @@ async function make_question_handler(ctx: CustomContext & { message: Message.Tex
         setStoredString(ctx.from.id, ctx.message.text)
       }
       else if (stored.length == 2) {
-        ctx.replyWithPhrase("questionCorrectAnswer", await returnKeyboard(ctx.from.id))
         if (ctx.message.text == await getPhrase("noLimit", ctx.from.id))
           setStoredString(ctx.from.id, "-No Answers-")
         else
           setStoredString(ctx.from.id, ctx.message.text)
+        ctx.replyWithPhrase("questionCorrectAnswer", await answerKeyboard(ctx.from.id, stored[2]))
       }
       else if (stored.length == 3) {
         const answer = (temp: string): string | null => { //Answer conversion
@@ -604,11 +604,11 @@ async function editing_handler(ctx: CustomContext & { message: Message.TextMessa
         setStoredString(ctx.from.id, ctx.message.text)
       }
       else if (stored.length == 3) {
-        ctx.replyWithPhrase("questionCorrectAnswer", await returnKeyboard(ctx.from.id))
-        if (ctx.message.text == await getPhrase("noLimit", ctx.from.id))
+          if (ctx.message.text == await getPhrase("noLimit", ctx.from.id))
           setStoredString(ctx.from.id, "-No Answers-")
         else
           setStoredString(ctx.from.id, ctx.message.text)
+        ctx.replyWithPhrase("questionCorrectAnswer", await answerKeyboard(ctx.from.id, stored[3]))
       }
       else if (stored.length == 4) {
         const answer = (temp: string): string | null => { //Answer conversion

@@ -10,7 +10,7 @@ export const sqliteConfig: SqliteConnectionOptions = {
   synchronize: true,
   logging: false
 }
-
+//export const postgresConfig = sqliteConfig
 export const postgresConfig: PostgresConnectionOptions = {
   type: "postgres",
     /*host: "ec2-54-155-226-153.eu-west-1.compute.amazonaws.com",

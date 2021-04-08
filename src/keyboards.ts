@@ -31,13 +31,15 @@ export async function adminKeyboard(userId: number){
 }
 
 export async function answerKeyboard(userId: number, answer:string) {
-  let temp = answer.split(";")
-  let temp2:string[][] = [];
-  for(let i=0;i<temp.length;i++){
-    temp2.push([temp[i]])
+  let temp:string[][] = [];
+  if(answer != "-No Answers-"){
+    let temp2 = answer.split(";")
+    for(let i=0;i<temp2.length;i++){
+      temp.push([temp2[i]])
+    }
   }
-  temp2.push([await getPhrase("menu", userId)])
-  return templet(temp2);
+  temp.push([await getPhrase("menu", userId)])
+  return templet(temp);
 }
 
 export async function languageKeyboard(userId: number) {
