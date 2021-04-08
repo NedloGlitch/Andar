@@ -20,5 +20,6 @@ export const postgresConfig:PostgresConnectionOptions = {
     database: "d2cpa1v5m6ul8d",
     synchronize: true,
     logging: false,
-    entities: [Users, Questions]
+    entities: [Users, Questions],
+    ssl:true
 }
