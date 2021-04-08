@@ -537,6 +537,7 @@ async function edit_question_handler(ctx: CustomContext & { message: Message.Tex
 async function edit_description_handler(ctx: CustomContext & { message: Message.TextMessage }) {
   if (!ctx.from) return; //exclude undefined in ctx.from 
   let stored = getStoredString(ctx.from.id)
+  console.log(stored)
   if (!stored) ctx.reply("edit description bad stuff");
   else {
     if (ctx.message.text == await getPhrase("menu", ctx.from.id)) {
@@ -568,6 +569,7 @@ async function edit_description_handler(ctx: CustomContext & { message: Message.
           temp = "ua"
         //let question:Omit<Questions, "id">
         let stored = getStoredString(ctx.from.id)
+        console.log(stored)
         if (!stored || stored.length < 4)
           ctx.reply("String lost, not enough data")
         else {
@@ -642,6 +644,7 @@ async function rename_handler(ctx: CustomContext & { message: Message.TextMessag
     if (!stored || stored.length == 0)
       ctx.reply("String lost, not enough data")
     else {
+      //console.log(stored) //FORDELETION
       let quiz = await getCertainQuiz(stored[0])
       for(let i=0;i<quiz.length;i++){
         await createQuestion({
